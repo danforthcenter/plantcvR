@@ -184,8 +184,8 @@ trait.heatmap <- function(dfr, diff1, diff2, title, measure,
     pdf(file = paste0("pdf_images/",save.name, ".pdf"), width = 8, height = 8, pointsize = 8, useDingbats = FALSE)
   }
   reorg <- heatmap.2(vis.mat,
-                     cellnote = vis.mat,
-                     notecol = "black",
+                     # cellnote = vis.mat,
+                     # notecol = "black",
                      main = title,
                      Rowv = TRUE,
                      ## Rowv=as.dendrogram(hc),

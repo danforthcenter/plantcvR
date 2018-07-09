@@ -1,5 +1,5 @@
 library(data.table)
-library(reshape)
+# library(reshape)
 library(parallel)
 library(RSQLite)
 ############################## Read data from SQLite database ####################
@@ -14,7 +14,9 @@ conn <- dbConnect(drv, dbname = db)
 ## Query all metadata and feature data for VIS images
 vis.df <- dbGetQuery(conn = conn, 'SELECT * FROM metadata NATURAL JOIN features WHERE imgtype = "VIS"')
 ## Remove features with no data
-vis.df <- vis.df[,colSums(rbind(apply(vis.df[,seq(1, ncol(vis.df))], 2, function(x) length(unique(x))))) != 1]
+# vis.df <- vis.df[,colSums(rbind(apply(vis.df[,seq(1, ncol(vis.df))], 2, function(x) length(unique(x))))) != 1]
+vis.df = vis.df[,apply(vis.df[,seq(1, ncol(vis.df))], 2, function(x) unique(x)) != "0"]
+
 
 ## Index the data by timestamp
 vis.dt <- data.table(vis.df, key = "timestamp")
@@ -36,7 +38,9 @@ plantcv.data <- mclapply(snapshots, function(snap) {
     names(row) <- gsub(regex, paste0(tolower(row$camera), row$frame, "_", "\\1"), names(row), perl = T)
     return(row)
   })
-  merge_recurse(rows, by = "timestamp")
+  # merge_recurse(rows, by = "timestamp")
+  Reduce(function(x, y) merge(x, y, by=c("timestamp", "measurementlabel", "plantbarcode"), 
+                              all=TRUE), rows, accumulate = FALSE)
 })
 plantcv.data <- do.call(rbind, plantcv.data)
 
